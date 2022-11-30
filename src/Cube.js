@@ -10,6 +10,8 @@ import {
   Group,
 } from "three";
 
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+
 // Internal dependencies
 import "./Cube.scss";
 
@@ -27,59 +29,131 @@ export default function Cube() {
     const containerWidth = container.offsetWidth;
     const containerHeight = container.offsetHeight;
 
-    elements.current.camera = new PerspectiveCamera(
+    let { scene, camera, renderer } = elements.current;
+
+    camera = new PerspectiveCamera(
       70,
       window.innerWidth / window.innerHeight,
       0.01,
       10
     );
 
-    elements.current.camera.position.z = 1;
+    camera.position.z = 1;
 
-    elements.current.renderer.setSize(containerWidth, containerHeight);
+    renderer.setSize(containerWidth, containerHeight);
 
-    elements.current.group = new Group();
-
-    for (let i = -1; i <= 1; i++) {
-      for (let j = -1; j <= 1; j++) {
-        for (let k = -1; k <= 1; k++) {
+    for (let x = -1; x <= 1; x++) {
+      for (let y = -1; y <= 1; y++) {
+        for (let z = -1; z <= 1; z++) {
           const box = new BoxGeometry(0.1, 0.1, 0.1);
           const material = new MeshNormalMaterial();
           const mesh = new Mesh(box, material);
-          mesh.position.set(i * 0.1, j * 0.1, k * 0.1);
+          mesh.position.set(x * 0.1, y * 0.1, z * 0.1);
 
-          elements.current.group.add(mesh);
+          scene.add(mesh);
         }
       }
     }
 
-    elements.current.scene.add(elements.current.group);
+    container.appendChild(renderer.domElement);
 
-    container.appendChild(elements.current.renderer.domElement);
-    elements.current.renderer.render(
-      elements.current.scene,
-      elements.current.camera
-    );
+    const controls = new OrbitControls(camera, renderer.domElement);
+
+    renderer.render(scene, camera);
+
+    elements.current.scene = scene;
+    elements.current.renderer = renderer;
+    elements.current.camera = camera;
+    elements.current.controls = controls;
   };
 
-  const animateRotation = () => {
-    const { scene, camera, renderer } = elements.current;
+  const assignMeshesToTurnGroup = (face) => {
+    const turnGroup = new Group();
 
-    const animation = (time) => {
-      for (let groups of scene.children) {
-        for (let mesh of groups.children) {
-          mesh.rotation.x = time / 1000;
-          mesh.rotation.y = time / 1000;
-        }
-      }
+    const { scene } = elements.current;
+    const cubies = scene.children;
 
-      elements.current.group.rotation.x = time / 500;
-      elements.current.group.rotation.y = time / 500;
-
-      renderer.render(scene, camera);
+    const mapping = {
+      T: { axis: "y", coefficient: 1 },
+      D: { axis: "y", coefficient: -1 },
+      F: { axis: "z", coefficient: 1 },
+      B: { axis: "z", coefficient: -1 },
+      L: { axis: "x", coefficient: -1 },
+      R: { axis: "x", coefficient: 1 },
     };
 
-    renderer.setAnimationLoop(animation);
+    const cubiesToTurn = [];
+
+    for (let i = 0; i < cubies.length; i++) {
+      const cubie = cubies[i];
+
+      if (
+        cubie.position[mapping[face].axis] ===
+        0.1 * mapping[face].coefficient
+      ) {
+        cubiesToTurn.push(cubies[i]);
+      }
+    }
+
+    cubiesToTurn.forEach((cubieToTurn) => turnGroup.add(cubieToTurn));
+
+    return turnGroup;
+  };
+
+  const executeStep = (step) => {
+    return new Promise((resolve) => {
+      const face = step[0];
+      const rotationAngle = ((parseInt(step[1], 10) || 1) * 90 * Math.PI) / 180;
+
+      let rotationAxis;
+
+      let turnGroup = assignMeshesToTurnGroup(face);
+
+      if (face === "T" || face === "D") rotationAxis = "y";
+      if (face === "L" || face === "R") rotationAxis = "x";
+      if (face === "F" || face === "B") rotationAxis = "z";
+
+      const { scene, camera, renderer } = elements.current;
+
+      scene.add(turnGroup);
+
+      let counter = 0;
+      renderer.setAnimationLoop(() => {
+        turnGroup.rotation[rotationAxis] += rotationAngle / 60;
+        renderer.render(scene, camera);
+        counter++;
+
+        if (counter === 60) {
+          renderer.setAnimationLoop(null);
+
+          const cubiesToRemove = [];
+
+          for (let i = 0; i < turnGroup.children.length; i++) {
+            cubiesToRemove.push(turnGroup.children[i]);
+          }
+
+          cubiesToRemove.forEach((cubieToRemove) => {
+            turnGroup.remove(cubieToRemove);
+            scene.add(cubieToRemove);
+          });
+
+          turnGroup.parent.remove(turnGroup);
+          turnGroup = null;
+
+          renderer.render(scene, camera);
+          resolve();
+        }
+      });
+    });
+  };
+
+  const executeSteps = async (steps) => {
+    steps = steps.split(" ");
+    for (let i = 0; i < steps.length; i++) {
+      console.log("Executing", steps[i]);
+      await executeStep(steps[i]);
+      console.log("Executed", steps[i]);
+    }
   };
 
   /* end of control functions */
@@ -93,7 +167,7 @@ export default function Cube() {
     <div
       className="app"
       ref={containerElement}
-      onClick={() => animateRotation()}
+      onClick={async () => await executeSteps("T1 F1 L2 F2 F1 D1 T2")}
     ></div>
   );
 }
