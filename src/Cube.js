@@ -1,18 +1,19 @@
-import { useRef, useEffect } from "react";
-
+import { useRef, useEffect, useContext } from "react";
 import {
   WebGLRenderer,
   PerspectiveCamera,
   BoxGeometry,
-  MeshNormalMaterial,
+  MeshLambertMaterial,
   Scene,
   Mesh,
+  AmbientLight,
   Group,
+  Float32BufferAttribute,
+  Color,
 } from "three";
 
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-
 // Internal dependencies
+import AppContext from "./AppContext";
 import "./Cube.scss";
 
 export default function Cube() {
@@ -21,6 +22,7 @@ export default function Cube() {
     scene: new Scene(),
     camera: null,
     renderer: new WebGLRenderer({ antialias: true }),
+    light: new AmbientLight(0xffffff, 1),
   });
 
   /* 3D control functions */
@@ -29,7 +31,9 @@ export default function Cube() {
     const containerWidth = container.offsetWidth;
     const containerHeight = container.offsetHeight;
 
-    let { scene, camera, renderer } = elements.current;
+    let { scene, camera, light, renderer } = elements.current;
+
+    scene.add(light);
 
     camera = new PerspectiveCamera(
       70,
@@ -39,6 +43,9 @@ export default function Cube() {
     );
 
     camera.position.z = 1;
+    camera.position.x = 0.5;
+    camera.position.y = 0.5;
+    camera.lookAt(scene.position);
 
     renderer.setSize(containerWidth, containerHeight);
 
@@ -46,9 +53,13 @@ export default function Cube() {
       for (let y = -1; y <= 1; y++) {
         for (let z = -1; z <= 1; z++) {
           const box = new BoxGeometry(0.1, 0.1, 0.1);
-          const material = new MeshNormalMaterial();
+          const material = new MeshLambertMaterial({
+            vertexColors: true,
+          });
           const mesh = new Mesh(box, material);
           mesh.position.set(x * 0.1, y * 0.1, z * 0.1);
+
+          applyColorToCubie(mesh, 0x00ff00);
 
           scene.add(mesh);
         }
@@ -57,14 +68,11 @@ export default function Cube() {
 
     container.appendChild(renderer.domElement);
 
-    const controls = new OrbitControls(camera, renderer.domElement);
-
     renderer.render(scene, camera);
 
     elements.current.scene = scene;
     elements.current.renderer = renderer;
     elements.current.camera = camera;
-    elements.current.controls = controls;
   };
 
   const assignMeshesToTurnGroup = (face) => {
@@ -88,14 +96,18 @@ export default function Cube() {
       const cubie = cubies[i];
 
       if (
-        cubie.position[mapping[face].axis] ===
-        0.1 * mapping[face].coefficient
+        almostEqual(
+          cubie.position[mapping[face].axis],
+          0.1 * mapping[face].coefficient
+        )
       ) {
         cubiesToTurn.push(cubies[i]);
       }
     }
 
-    cubiesToTurn.forEach((cubieToTurn) => turnGroup.add(cubieToTurn));
+    cubiesToTurn.forEach((cubieToTurn) => {
+      turnGroup.add(cubieToTurn);
+    });
 
     return turnGroup;
   };
@@ -103,7 +115,8 @@ export default function Cube() {
   const executeStep = (step) => {
     return new Promise((resolve) => {
       const face = step[0];
-      const rotationAngle = ((parseInt(step[1], 10) || 1) * 90 * Math.PI) / 180;
+      const rotationAngle =
+        -((parseInt(step[1], 10) || 1) * 90 * Math.PI) / 180;
 
       let rotationAxis;
 
@@ -133,11 +146,10 @@ export default function Cube() {
           }
 
           cubiesToRemove.forEach((cubieToRemove) => {
-            turnGroup.remove(cubieToRemove);
-            scene.add(cubieToRemove);
+            scene.attach(cubieToRemove);
           });
 
-          turnGroup.parent.remove(turnGroup);
+          turnGroup.removeFromParent();
           turnGroup = null;
 
           renderer.render(scene, camera);
@@ -150,11 +162,24 @@ export default function Cube() {
   const executeSteps = async (steps) => {
     steps = steps.split(" ");
     for (let i = 0; i < steps.length; i++) {
-      console.log("Executing", steps[i]);
       await executeStep(steps[i]);
-      console.log("Executed", steps[i]);
     }
   };
+
+  function applyColorToCubie(mesh) {
+    mesh.geometry = mesh.geometry.toNonIndexed();
+    const positionAttribute = mesh.geometry.getAttribute("position");
+
+    let colorHolder = new Color();
+    let colors = [];
+    for (let i = 0; i < positionAttribute.count; i += 6) {
+      colorHolder.set(Math.random() * 0xffffff);
+      for (let j = 0; j < 6; j++)
+        colors.push(colorHolder.r, colorHolder.g, colorHolder.b);
+    }
+
+    mesh.geometry.setAttribute("color", new Float32BufferAttribute(colors, 3));
+  }
 
   /* end of control functions */
 
@@ -163,11 +188,17 @@ export default function Cube() {
     initScene();
   }, []);
 
+  const { cubeGrid } = useContext(AppContext).value;
+
   return (
     <div
       className="app"
       ref={containerElement}
-      onClick={async () => await executeSteps("T1 F1 L2 F2 F1 D1 T2")}
+      onClick={async () => await executeSteps("F1 T1 L2 F2 T1 D2 B1 T2 F2")}
     ></div>
   );
+}
+
+function almostEqual(float1, float2) {
+  return Math.abs(float1 - float2) < 0.05;
 }
