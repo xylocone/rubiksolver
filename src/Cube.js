@@ -188,7 +188,7 @@ export default function Cube() {
     initScene();
   }, []);
 
-  const { cubeGrid } = useContext(AppContext).value;
+  const { cubeGrid } = useContext(AppContext);
 
   return (
     <div
