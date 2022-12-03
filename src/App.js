@@ -4,9 +4,10 @@ import { useState } from "react";
 import "./App.scss";
 import Cube from "./Cube";
 import AppContext from "./AppContext";
+import CubeGrid from "./classes/CubeGrid";
 
 export default function App() {
-  const [cubeGrid, setCubeGrid] = useState(null);
+  const [cubeGrid, setCubeGrid] = useState(new CubeGrid());
   return (
     <AppContext.Provider
       value={{

@@ -8,15 +8,17 @@ import {
   Mesh,
   AmbientLight,
   Group,
-  Float32BufferAttribute,
-  Color,
 } from "three";
 
 // Internal dependencies
 import AppContext from "./AppContext";
+import Face from "./classes/Face";
+import Axis from "./classes/Axis";
 import "./Cube.scss";
 
 export default function Cube() {
+  const { cubeGrid } = useContext(AppContext);
+
   const containerElement = useRef(null);
   const elements = useRef({
     scene: new Scene(),
@@ -59,7 +61,19 @@ export default function Cube() {
           const mesh = new Mesh(box, material);
           mesh.position.set(x * 0.1, y * 0.1, z * 0.1);
 
-          applyColorToCubie(mesh, 0x00ff00);
+          const faceAxes = [];
+
+          if (x === -1) faceAxes.push(new Axis(Axis.NegativeX));
+          else if (x === 1) faceAxes.push(new Axis(Axis.PositiveX));
+          if (y === -1) faceAxes.push(new Axis(Axis.NegativeY));
+          else if (y === 1) faceAxes.push(new Axis(Axis.PositiveY));
+          if (z === -1) faceAxes.push(new Axis(Axis.NegativeZ));
+          else if (z === 1) faceAxes.push(new Axis(Axis.PositiveZ));
+
+          faceAxes.forEach((axis) => {
+            const face = new Face(Face.getFaceTypeFromAxis(axis), mesh);
+            face.applyColor(cubeGrid.grid[face.faceType][0]);
+          });
 
           scene.add(mesh);
         }
@@ -166,29 +180,12 @@ export default function Cube() {
     }
   };
 
-  function applyColorToCubie(mesh) {
-    mesh.geometry = mesh.geometry.toNonIndexed();
-    const positionAttribute = mesh.geometry.getAttribute("position");
-
-    let colorHolder = new Color();
-    let colors = [];
-    for (let i = 0; i < positionAttribute.count; i += 6) {
-      colorHolder.set(Math.random() * 0xffffff);
-      for (let j = 0; j < 6; j++)
-        colors.push(colorHolder.r, colorHolder.g, colorHolder.b);
-    }
-
-    mesh.geometry.setAttribute("color", new Float32BufferAttribute(colors, 3));
-  }
-
   /* end of control functions */
 
   useEffect(() => {
     // onComponentDidMount()
     initScene();
   }, []);
-
-  const { cubeGrid } = useContext(AppContext);
 
   return (
     <div
