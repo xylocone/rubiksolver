@@ -10,15 +10,14 @@ import {
   Group,
 } from "three";
 
+// Class dependencies
+import Face from "../../classes/Face";
+import Axis from "../../classes/Axis";
+
 // Internal dependencies
-import AppContext from "./AppContext";
-import Face from "./classes/Face";
-import Axis from "./classes/Axis";
 import "./Cube.scss";
 
-export default function Cube() {
-  const { cubeGrid } = useContext(AppContext);
-
+export default function Cube({ cubeGrid }) {
   const containerElement = useRef(null);
   const elements = useRef({
     scene: new Scene(),
@@ -83,6 +82,18 @@ export default function Cube() {
     container.appendChild(renderer.domElement);
 
     renderer.render(scene, camera);
+
+    window.addEventListener("resize", () => {
+      const containerWidth = container.offsetWidth;
+      const containerHeight = container.offsetHeight;
+
+      camera.aspect = containerWidth / containerHeight;
+      camera.updateProjectionMatrix();
+
+      renderer.setSize(containerWidth, containerHeight);
+
+      renderer.render(scene, camera);
+    });
 
     elements.current.scene = scene;
     elements.current.renderer = renderer;
@@ -189,7 +200,7 @@ export default function Cube() {
 
   return (
     <div
-      className="app"
+      className="cube"
       ref={containerElement}
       onClick={async () => await executeSteps("F1 T1 L2 F2 T1 D2 B1 T2 F2")}
     ></div>

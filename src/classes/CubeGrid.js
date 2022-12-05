@@ -35,7 +35,5 @@ export default class CubeGrid {
         this.addColorsToFace(face, possibleColors[randomIndex]);
       possibleColors.splice(randomIndex, 1);
     });
-
-    console.log(this.grid);
   }
 }
