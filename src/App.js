@@ -15,6 +15,7 @@ import "./App.scss";
 export default function App() {
   const [currentView, setCurrentView] = useState(View.InputView);
   const [cubeGrid, setCubeGrid] = useState(new CubeGrid());
+  const [solution, setSolution] = useState([]);
 
   function goToNextView() {
     switch (currentView) {
@@ -33,6 +34,8 @@ export default function App() {
       value={{
         cubeGrid,
         setCubeGrid,
+        solution,
+        setSolution,
         goToNextView,
       }}
     >
