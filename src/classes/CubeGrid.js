@@ -6,34 +6,20 @@ export default class CubeGrid {
     this.grid = this.faces
       .map((face) => ({ [face]: [] }))
       .reduce((prev, curr) => Object.assign(prev, curr));
-
-    this.initWithSolvedColors();
   }
 
-  addColorsToFace(face, colors) {
-    /* Colors are to be added to the face, left to right, from the upperleft corner to the bottomright /*/
+  applyColorsToFace(face, colors) {
+    /* Colors are to be added to the face, left to right, from the upperleft corner to the bottomright */
     if (colors.constructor !== Array) colors = [colors];
-    this.grid[face].push(...colors);
+    this.grid[face] = colors;
   }
 
-  initWithSolvedColors() {
-    const possibleColors = [
-      "red",
-      "green",
-      "yellow",
-      "orange",
-      "white",
-      "blue",
-    ];
+  isComplete() {
+    // Have all the faces been assigned their colors?
+    for (const face in this.grid) {
+      for (const color of face) if (!color) return false;
+    }
 
-    this.faces.forEach((face) => {
-      const randomIndex = parseInt(
-        Math.floor(Math.random() * possibleColors.length),
-        10
-      );
-      for (let i = 0; i < 6; i++)
-        this.addColorsToFace(face, possibleColors[randomIndex]);
-      possibleColors.splice(randomIndex, 1);
-    });
+    return true;
   }
 }
