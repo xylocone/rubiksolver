@@ -1,0 +1,61 @@
+@import "../../variables";
+
+.solution-display {
+  // Display and Box Model
+  display: flex;
+  flex-direction: column;
+  gap: 0.5 * $spacing;
+  padding: 2 * $spacing;
+
+  .solution-display__label {
+    // Others
+    font-size: 1.125rem;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .solution-display__solution {
+    // Positioning
+    position: relative;
+
+    // Display and Box Model
+    padding: 2 * $spacing;
+
+    // Others
+    border-radius: 2 * $spacing;
+    background-color: rgb(211, 211, 211);
+    overflow-x: auto;
+
+    .solution-display__steps {
+      // Others
+      white-space: nowrap;
+      font-size: 1rem;
+    }
+
+    .solution-display__copy-button {
+      // Positioning
+      position: absolute;
+      top: 50%;
+      right: $spacing;
+      transform: translateY(-50%);
+
+      // Display and Box Model
+      padding: $spacing;
+
+      // Others
+      text-transform: uppercase;
+      border-radius: $spacing;
+      background-color: $primary-color;
+      color: white;
+      opacity: 0.5;
+
+      &:hover {
+        opacity: 1;
+      }
+
+      &:disabled {
+        opacity: 0.5 !important;
+      }
+    }
+  }
+}

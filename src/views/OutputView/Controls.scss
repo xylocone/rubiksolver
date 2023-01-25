@@ -1,0 +1,21 @@
+@import "../../variables";
+
+.controls {
+  // Display and Box Model
+  display: flex;
+  justify-content: center;
+  padding: 2 * $spacing;
+
+  .controls__buttons-wrapper {
+    // Display and Box Model
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    padding: 2 * $spacing;
+    max-width: 200px;
+
+    // Others
+    background-color: lightgray;
+    border-radius: 4 * $spacing;
+  }
+}
