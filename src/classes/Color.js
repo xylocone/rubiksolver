@@ -49,4 +49,23 @@ export default class Color {
         return;
     }
   }
+
+  static fromAlias(alias) {
+    switch (alias) {
+      case "U":
+        return Color.Red;
+      case "F":
+        return Color.Yellow;
+      case "B":
+        return Color.Orange;
+      case "D":
+        return Color.Green;
+      case "L":
+        return Color.Blue;
+      case "R":
+        return Color.White;
+      default:
+        return;
+    }
+  }
 }
