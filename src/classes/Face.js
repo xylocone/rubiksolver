@@ -59,6 +59,8 @@ export default class Face {
   }
 
   applyColor(color) {
+    color = color.hex;
+
     const colorAttributeArray = Array.from(
       this.geometry.getAttribute("color")?.array || new Array(3 * 6 * 6).fill(0)
     );
