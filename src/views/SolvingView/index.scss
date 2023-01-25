@@ -1,0 +1,47 @@
+@import "../../variables";
+
+.solving-view {
+  // Display and Box Model
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .solving-view__spinner {
+    // Display and Box Model
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4 * $spacing;
+
+    .solving-view__spinner__circle {
+      // Display and Box Model
+      height: 25vmin;
+      width: 25vmin;
+
+      // Others
+      border: 5px solid $primary-color;
+      border-radius: 100%;
+
+      animation: spin 1s ease infinite alternate;
+    }
+
+    .solving-view__spinner__text {
+      // Others
+      font-size: 1.4rem;
+      text-align: center;
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
