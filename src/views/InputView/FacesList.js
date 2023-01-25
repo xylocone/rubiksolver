@@ -25,7 +25,7 @@ export default function FacesList({
                 <div
                   key={index}
                   className="faces-list__cell"
-                  style={{ "--cell-color": cell }}
+                  style={{ "--cell-color": cell.hex }}
                 ></div>
               ))}
             </div>

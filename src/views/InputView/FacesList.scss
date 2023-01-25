@@ -2,8 +2,9 @@
 
 .faces-list {
   // Display and Box Model
-  height: 20%;
+  height: 100%;
   padding: $spacing * 2;
+  flex: 1 1 0;
   display: flex;
   align-items: center;
   gap: 2 * $spacing;
@@ -37,8 +38,11 @@
     }
 
     &.selected {
+      // Display and Box Model
+      padding: 2px;
+
       // Others
-      border: 2px solid tomato;
+      border: 2px solid $secondary-color;
     }
   }
 }

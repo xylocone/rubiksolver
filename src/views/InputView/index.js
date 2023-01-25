@@ -21,6 +21,15 @@ export default function InputView() {
     Face.Back,
   ]);
 
+  const instructions = useRef([
+    "Show any face",
+    "Show the face to its right",
+    "Show the face on top",
+    "Show the left face",
+    "Show the face at the bottom",
+    "Show the back face",
+  ]);
+
   const { cubeGrid, goToNextView } = useContext(AppContext);
   const [currentFaceIndex, setCurrentFaceIndex] = useState(0);
 
@@ -42,7 +51,12 @@ export default function InputView() {
         setCurrentFaceIndex={setCurrentFaceIndex}
       />
       <CaptureArea
-        currentFace={order.current[currentFaceIndex]}
+        currentInstruction={(() => {
+          const currentInstruction = instructions.current[currentFaceIndex];
+          /* set the instruction to an empty string so that it does not appear again if the user manually changes the current face from the FacesList */
+          instructions.current[currentFaceIndex] = "";
+          return currentInstruction;
+        })()}
         onCapture={(colorsList) => {
           updateCubeGrid(order.current[currentFaceIndex], colorsList);
           updateCurrentFaceIndex();

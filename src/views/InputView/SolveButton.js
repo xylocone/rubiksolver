@@ -1,3 +1,6 @@
+// Icons
+import { BsArrowRight } from "react-icons/bs";
+
 // Internal dependencies
 import "./SolveButton.scss";
 
@@ -9,7 +12,7 @@ export default function SolveButton({ onClick, disabled }) {
         onClick={() => onClick()}
         disabled={disabled}
       >
-        Solve
+        Solve <BsArrowRight />
       </button>
     </div>
   );

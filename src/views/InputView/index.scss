@@ -1,4 +1,6 @@
 .input-view {
   // Display and Box Model
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }

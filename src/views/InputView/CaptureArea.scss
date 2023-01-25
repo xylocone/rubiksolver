@@ -5,13 +5,35 @@
   position: relative;
 
   // Display and Box Model
-  height: 70%;
+  height: 100%;
+  flex: 8 8 0;
+  display: flex;
+  justify-content: center;
+
+  // Others
+  background-color: #000;
+}
+
+.capture-area__instruction {
+  // Positioning
+  position: absolute;
+  top: 4 * $spacing;
+
+  // Display and Box Model
+  max-width: 80%;
+  padding: $spacing 2 * $spacing;
+
+  // Others
+  font-size: 1.25rem;
+  text-align: center;
+  background-color: white;
+  border-radius: 4 * $spacing;
 }
 
 .capture-area__preview {
   // Display and Box Model
-  height: 100%;
-  width: 100%;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .capture-area__button {
@@ -19,18 +41,21 @@
   position: absolute;
   top: 100%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -75%);
 
   // Display and Box Model
-  padding: 2 * $spacing $spacing;
+  height: 8vmax;
+  width: 8vmax;
+  padding: 2 * $spacing;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
   // Others
   cursor: pointer;
-  background-color: $primary-color;
+  font-size: 2rem;
+  background-color: $secondary-color;
   color: #fff;
-  text-transform: uppercase;
-  font-size: 1rem;
-  letter-spacing: 0.2rem;
-  font-weight: bold;
-  border-radius: 0.5 * $spacing;
+  border-radius: 50%;
 }

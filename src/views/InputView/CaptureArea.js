@@ -1,10 +1,18 @@
 import { useEffect, useRef } from "react";
 
+import Cube from "cubejs";
+
+// Icons
+import { AiFillCamera } from "react-icons/ai";
+import Color from "../../classes/Color";
+
 // Internal dependencies
 import "./CaptureArea.scss";
 
-export default function CaptureArea({ onCapture }) {
+export default function CaptureArea({ currentInstruction, onCapture }) {
   const videoElement = useRef(null);
+
+  const cubeOrder = useRef([...Cube.random().asString()]); // only for testing
 
   useEffect(() => {
     (async () => {
@@ -32,18 +40,31 @@ export default function CaptureArea({ onCapture }) {
   function processImage(imageData) {
     /* This function is supposed to take in an image, apply Computer Vision algorithms on it to turn it into a 3 * 3 grid of colors */
     // For now, this is going to return a grid with colors assigned randomly
-    return Array(9).fill("rebeccapurple");
+    const colors = [];
+
+    for (let i = 0; i < 9; i++) {
+      const alias = cubeOrder.current.shift();
+
+      colors.push(new Color(Color.fromAlias(alias)));
+    }
+
+    console.log(colors.map((color) => color.alias).join(""));
+
+    return colors;
   }
 
   return (
     <div className="capture-area">
+      {currentInstruction && (
+        <p className="capture-area__instruction">{currentInstruction}</p>
+      )}
       <video
         className="capture-area__preview"
         autoPlay={true}
         ref={videoElement}
       ></video>
       <button className="capture-area__button" onClick={() => handleCapture()}>
-        Capture
+        <AiFillCamera />
       </button>
     </div>
   );
