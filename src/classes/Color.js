@@ -5,4 +5,48 @@ export default class Color {
   static Green = Symbol("Green");
   static Blue = Symbol("Blue");
   static White = Symbol("White");
+
+  constructor(color) {
+    this.color = color;
+    this.alias = this.getAlias();
+    this.hex = this.getHex();
+  }
+
+  getHex() {
+    switch (this.color) {
+      case Color.Red:
+        return "#ff0000";
+      case Color.Yellow:
+        return "#ffff00";
+      case Color.Orange:
+        return "#ffa500";
+      case Color.Green:
+        return "#00ff00";
+      case Color.Blue:
+        return "#0000ff";
+      case Color.White:
+        return "#ffffff";
+      default:
+        return;
+    }
+  }
+
+  getAlias() {
+    switch (this.color) {
+      case Color.Red:
+        return "U";
+      case Color.Yellow:
+        return "F";
+      case Color.Orange:
+        return "B";
+      case Color.Green:
+        return "D";
+      case Color.Blue:
+        return "L";
+      case Color.White:
+        return "R";
+      default:
+        return;
+    }
+  }
 }
