@@ -16,8 +16,8 @@ export default class CubeGrid {
 
   isComplete() {
     // Have all the faces been assigned their colors?
-    for (const face in this.grid) {
-      for (const color of face) if (!color) return false;
+    for (const face of Object.getOwnPropertySymbols(this.grid)) {
+      if (this.grid[face].length < 6) return false;
     }
 
     return true;
